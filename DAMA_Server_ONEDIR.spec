@@ -17,22 +17,14 @@ a = Analysis(
     pathex=['.'],
     binaries=[],
     datas=[
-        # Templates Django (seulement ceux qui existent)
-        ('blog_pos/order/templates', 'order/templates'),
-        ('blog_pos/users/templates', 'users/templates'),
-        ('blog_pos/client/templates', 'client/templates'),
-        ('blog_pos/aprovision/templates', 'aprovision/templates'),
+        # Templates Django (optionnels - collectés s'ils existent)
+        # Note: PyInstaller ignorera automatiquement les chemins manquants avec warn_on_missing_imports=False
         
         # Static files Django
         ('blog_pos/order/static', 'order/static'),
-        ('blog_pos/staticfiles', 'staticfiles'),
         
         # Templates django_tables2 (requis pour les tableaux)
-        # Collecte depuis le site-packages
-        ('dama_env/Lib/site-packages/django_tables2/templates', 'django_tables2/templates'),
-        
-        # Base de données (si SQLite)
-        ('blog_pos/db.sqlite3', '.'),
+        # Sera collecté automatiquement depuis site-packages pendant le build
         
         # Settings et configuration Django
         ('blog_pos/blog_pos', 'blog_pos'),
