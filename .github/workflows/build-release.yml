@@ -1,0 +1,102 @@
+name: Build and Release WELTO
+
+on:
+  push:
+    tags:
+      - 'v*'  # Déclencher sur les tags version (ex: v1.0.1, v1.0.2)
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: desktop_app/package-lock.json
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r blog_pos/requirements.txt
+          pip install pyinstaller
+      
+      - name: Build Django executable
+        run: |
+          python -c "import sys; print(f'Python: {sys.version}')"
+          pyinstaller --clean DAMA_Server_ONEDIR.spec
+      
+      - name: Prepare Electron resources
+        run: |
+          # Copier l'exécutable Django
+          xcopy dist\DAMA_Django_Server desktop_app\resources\DAMA_Django_Server\ /E /I /Y
+          
+          # Copier les modules Django essentiels
+          xcopy blog_pos\blog_pos desktop_app\resources\blog_pos\ /E /I /Y
+          xcopy blog_pos\order desktop_app\resources\order\ /E /I /Y
+          xcopy blog_pos\users desktop_app\resources\users\ /E /I /Y
+          xcopy blog_pos\client desktop_app\resources\client\ /E /I /Y
+          xcopy blog_pos\aprovision desktop_app\resources\aprovision\ /E /I /Y
+          xcopy blog_pos\product desktop_app\resources\product\ /E /I /Y
+          xcopy blog_pos\licensing desktop_app\resources\licensing\ /E /I /Y
+          xcopy blog_pos\staticfiles desktop_app\resources\staticfiles\ /E /I /Y
+        shell: powershell
+      
+      - name: Install Electron dependencies
+        working-directory: desktop_app
+        run: npm ci
+      
+      - name: Build Electron app
+        working-directory: desktop_app
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.DISTRIBUTION_TOKEN }}
+      
+      - name: Upload to welto-distribution repo
+        uses: softprops/action-gh-release@v1
+        with:
+          repository: ${{ github.repository_owner }}/welto-distribution
+          files: |
+            desktop_app/dist/*.exe
+            desktop_app/dist/*.yml
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## WELTO POS - Version ${{ github.ref_name }}
+            
+            ### Fichiers de distribution
+            - `WELTO-Setup-${{ github.ref_name }}.exe` - Installateur Windows
+            - `WELTO-Portable.exe` - Version portable
+            - `latest.yml` - Métadonnées pour auto-update
+            
+            ### Installation
+            1. Télécharger `WELTO-Setup-${{ github.ref_name }}.exe`
+            2. Exécuter l'installateur
+            3. Suivre les instructions
+            
+            ### Mise à jour
+            Si vous avez déjà WELTO installé, l'application détectera automatiquement cette mise à jour.
+            
+            ---
+            © 2025 GABITHEX TEAM - Développé par Aliou Diallo
+        env:
+          GITHUB_TOKEN: ${{ secrets.DISTRIBUTION_TOKEN }}
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: welto-windows-installer
+          path: |
+            desktop_app/dist/*.exe
+          retention-days: 30

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WELTO - Chargement</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0000f3;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .loading-container {
+            text-align: center;
+            max-width: 500px;
+            padding: 60px 40px;
+            position: relative;
+            border: 2px solid #ff8c00;
+            border-radius: 20px;
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: white;
+            text-shadow: 0 0 10px #ff8c00;
+            letter-spacing: 3px;
+            border-bottom: 3px solid #ff8c00;
+            padding-bottom: 15px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: white;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+        
+        .spinner-container {
+            position: relative;
+            margin: 40px auto;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #ff8c00;
+            border-right: 4px solid #ff8c00;
+            border-radius: 50%;
+            animation: spin 1.2s linear infinite;
+            box-shadow: 0 0 15px rgba(255, 140, 0, 0.3);
+        }
+        
+        .spinner-inner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255,255,255,0.05);
+            border-bottom: 3px solid #ff8c00;
+            border-radius: 50%;
+            animation: spin 2s linear infinite reverse;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .status {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 20px;
+            min-height: 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin: 30px 0 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8c00, #ffa500);
+            border-radius: 2px;
+            animation: progress 3s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(255, 140, 0, 0.4);
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        .version {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+        
+        .error-container {
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .error-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffcccb;
+        }
+        
+        .error-message {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+        
+        .retry-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .retry-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        
+        .tips {
+            margin-top: 40px;
+            font-size: 0.85rem;
+            opacity: 0.7;
+            line-height: 1.4;
+        }
+        
+        /* Animation d'apparition */
+        .loading-container {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="logo">WELTO</div>
+        <div class="subtitle">Point of Sale System</div>
+        
+        <div class="loading-text">Chargement en cours...</div>
+        
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="spinner-inner"></div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        
+        <div class="status" id="loading-status">
+            Initialisation...
+        </div>
+        
+        <div class="error-container" id="error-container">
+            <div class="error-title">Erreur de Démarrage</div>
+            <div class="error-message" id="error-message"></div>
+            <button class="retry-btn" onclick="retryStartup()">Réessayer</button>
+        </div>
+        
+        <div class="tips">
+            Veuillez patienter pendant le chargement
+        </div>
+        
+        <div class="version">v1.0.0</div>
+    </div>
+
+    <script>
+        let retryCount = 0;
+        let maxRetries = 3;
+        let statusMessages = [
+            'Préparation...',
+            'Démarrage...',
+            'Chargement des données...',
+            'Configuration...',
+            'Finalisation...',
+            'Presque prêt...'
+        ];
+        let currentMessageIndex = 0;
+        
+        // Simulation du processus de chargement
+        function simulateLoading() {
+            if (currentMessageIndex < statusMessages.length) {
+                updateStatus(statusMessages[currentMessageIndex]);
+                currentMessageIndex++;
+                
+                // Changer le message toutes les 2 secondes
+                setTimeout(simulateLoading, 2000);
+            }
+        }
+        
+        function updateStatus(message) {
+            const statusElement = document.getElementById('loading-status');
+            if (statusElement) {
+                statusElement.textContent = message;
+            }
+        }
+        
+        function showError(message) {
+            const errorContainer = document.getElementById('error-container');
+            const errorMessage = document.getElementById('error-message');
+            
+            if (errorContainer && errorMessage) {
+                errorMessage.textContent = message;
+                errorContainer.style.display = 'block';
+                
+                // Masquer le spinner
+                document.querySelector('.spinner-container').style.display = 'none';
+                document.querySelector('.progress-bar').style.display = 'none';
+            }
+        }
+        
+        function retryStartup() {
+            retryCount++;
+            
+            if (retryCount >= maxRetries) {
+                showError('Nombre maximum de tentatives atteint. Veuillez redémarrer l\'application.');
+                return;
+            }
+            
+            // Masquer l'erreur et relancer
+            document.getElementById('error-container').style.display = 'none';
+            document.querySelector('.spinner-container').style.display = 'block';
+            document.querySelector('.progress-bar').style.display = 'block';
+            
+            updateStatus(`Nouvelle tentative (${retryCount}/${maxRetries})...`);
+            
+            // Simuler un redémarrage
+            setTimeout(() => {
+                currentMessageIndex = 0;
+                simulateLoading();
+            }, 1000);
+        }
+        
+        // Démarrer la simulation
+        setTimeout(simulateLoading, 1000);
+        
+        // Écouter les messages du processus principal
+        if (window.electronAPI) {
+            window.electronAPI.onStatusUpdate((message) => {
+                updateStatus(message);
+            });
+            
+            window.electronAPI.onError((error) => {
+                showError(error);
+            });
+        }
+        
+        // Vérifier périodiquement si Django est prêt
+        function checkDjangoStatus() {
+            fetch('http://127.0.0.1:8000/', { 
+                method: 'HEAD',
+                mode: 'no-cors'
+            })
+            .then(() => {
+                updateStatus('Application prête ! Ouverture...');
+                setTimeout(() => {
+                    window.location.href = 'http://127.0.0.1:8000/';
+                }, 1500);
+            })
+            .catch(() => {
+                // Django pas encore prêt, continuer à attendre
+            });
+        }
+        
+        // Commencer à vérifier après 5 secondes
+        setTimeout(() => {
+            const interval = setInterval(checkDjangoStatus, 2000);
+            
+            // Arrêter après 60 secondes si pas de connexion
+            setTimeout(() => {
+                clearInterval(interval);
+                if (window.location.href.includes('loading.html')) {
+                    showError('Impossible de démarrer l\'application. Veuillez réessayer.');
+                }
+            }, 60000);
+        }, 5000);
+        
+        // Ajouter des effets visuels
+        document.addEventListener('DOMContentLoaded', () => {
+            // Effet de particules (optionnel)
+            createParticles();
+        });
+        
+        function createParticles() {
+            const container = document.querySelector('.loading-container');
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '2px';
+                particle.style.height = '2px';
+                particle.style.background = 'rgba(255,255,255,0.3)';
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `float ${3 + Math.random() * 4}s ease-in-out infinite`;
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // CSS pour l'animation des particules
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+                50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
