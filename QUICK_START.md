@@ -3,7 +3,7 @@
 ## ✅ Ce qui est Fait
 
 - ✅ Code modifié pour AppData et mises à jour
-- ✅ Dépôt `welto` existe (code source)
+- ✅ Dépôt `welto-pos` existe (code source)
 - ✅ Dépôt `welto-distribution` créé (vide pour l'instant)
 - ✅ package.json configuré: `"repo": "welto-distribution"`
 - ✅ GitHub Actions workflow créé
@@ -25,7 +25,7 @@
 ### 2️⃣ Ajouter le Secret (1 min)
 
 ```
-1. https://github.com/kossaiRedou/welto/settings/secrets/actions
+1. https://github.com/kossaiRedou/welto-pos/settings/secrets/actions
 2. "New repository secret"
 3. Name: DISTRIBUTION_TOKEN
 4. Secret: [Coller le token]
@@ -41,7 +41,7 @@ cd C:\Users\lenovo\Desktop\DAMA
 git remote -v
 
 # Si pas de remote:
-git remote add origin https://github.com/kossaiRedou/welto.git
+git remote add origin https://github.com/kossaiRedou/welto-pos.git
 
 # Commit et push
 git add .
@@ -52,7 +52,7 @@ git push origin main
 ### 4️⃣ Activer GitHub Actions (30 sec)
 
 ```
-1. https://github.com/kossaiRedou/welto
+1. https://github.com/kossaiRedou/welto-pos
 2. Onglet "Actions"
 3. "Enable workflows"
 ```
@@ -70,7 +70,7 @@ git push origin v1.0.0
 
 ### Pendant le build:
 ```
-https://github.com/kossaiRedou/welto/actions
+https://github.com/kossaiRedou/welto-pos/actions
 → Voir le workflow en cours
 ```
 

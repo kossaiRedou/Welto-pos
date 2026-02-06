@@ -33,8 +33,8 @@ WELTO est une application desktop professionnelle de gestion de point de vente i
 
 ```bash
 # 1. Cloner le dépôt
-git clone https://github.com/kossaiRedou/welto.git
-cd welto
+git clone https://github.com/kossaiRedou/welto-pos.git
+cd welto-pos
 
 # 2. Créer l'environnement Python
 python -m venv dama_env
@@ -201,7 +201,7 @@ Avantages:
 
 - **Email**: aliou@gabithex.fr
 - **Documentation**: Voir dossier /docs
-- **Issues**: GitHub Issues (dans dépôt privé welto)
+- **Issues**: GitHub Issues (dans dépôt privé welto-pos)
 
 ## 📜 Licence
 
