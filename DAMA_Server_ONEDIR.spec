@@ -41,6 +41,7 @@ a = Analysis(
         ('blog_pos/client', 'client'),
         ('blog_pos/aprovision', 'aprovision'),
         ('blog_pos/product', 'product'),
+        ('blog_pos/licensing', 'licensing'),
     ],
     hiddenimports=[
         'django.core.management',
@@ -58,6 +59,9 @@ a = Analysis(
         'users.views',
         'aprovision.models',
         'aprovision.views',
+        'licensing.models',
+        'licensing.views',
+        'licensing.license_manager',
         'uvicorn',
         'uvicorn.lifespan.on',
         'uvicorn.protocols.websockets.websockets_impl',
