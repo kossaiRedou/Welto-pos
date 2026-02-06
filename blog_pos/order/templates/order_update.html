@@ -1,0 +1,268 @@
+{% extends 'base_with_sidebar.html' %} {% load render_table from django_tables2 %}
+
+{% block title %}Modifier la commande{% endblock %}
+
+{% block page_title %}
+<i class="bi bi-pencil-square me-2"></i>
+Modifier la commande
+{% endblock %}
+
+
+
+{% block content %}
+    <div class="page-wrapper">
+        <div class="page-breadcrumb">
+            <div class="row">
+                
+                <div class="col-12 d-flex no-block align-items-center">
+                    <div class="ml-auto text-right">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'homepage' %}">Home</a></li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+
+                                 <div class="col-12 d-flex no-block align-items-center">
+                     <h4 class="page-title">
+                         {{ instance.date }} - 
+                         {% if instance.is_auto_generated_number %}
+                             {{ instance.order_number_display }}
+                         {% else %}
+                             {{ instance.title|default:"Commande sans titre" }}
+                         {% endif %}
+                     </h4>
+                 </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row mt-5">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="header">
+                            <h5 class="card-title">Products</h5>
+                            <input data-href='{% url "ajax-search" instance.id %}' type="text" class="form-control search_button" placeholder="Search">
+                        </div>
+                        <div class="card-body" id="product_container">
+
+                            {% include 'include/product_container.html' %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div id='order_item_container' class="card-body">
+                            {% include 'include/order_container.html' %}
+                        </div>
+                    </div>
+                    <div class="card mt-3">
+                        <div class="header">Edit</div>
+                        <div class="card-body">
+                            <form method="post" class="form">{% csrf_token %}
+                                {{ form }}
+                                <br>
+                                <button type="submit" class="btn btn-success me-2">Save</button>
+                                <a href="{% url 'order_action' instance.id 'cancel' %}" class="btn btn-outline-secondary">Annuler</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-md-12">
+                    <!-- Système de Paiement -->
+                    <div class="card">
+                        <div class="card-body" id="payments_container">
+                            {% include 'include/payments_container.html' with order=instance payments=instance.payments.all %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Actions commande: Done / Delete après Paiements -->
+                <div class="col-md-12 mt-3">
+                    <div class="card">
+                        <div class="card-body text-end">
+                            <a href="{% url 'done_order' instance.id %}" class="btn btn-success me-2" type="submit">
+                                <i class="bi bi-check2-circle me-1"></i>Terminer
+                            </a>
+                            <a href="{% url 'invoice_preview' instance.id %}" class="btn btn-outline-primary me-2">
+                                <i class="bi bi-receipt me-1"></i>Voir la facture
+                            </a>
+                            <a onclick="return confirm('Supprimer cette commande ?')" href="{% url 'delete_order' instance.id %}" class="btn btn-danger">
+                                <i class="bi bi-trash me-1"></i>Supprimer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+    {% include 'include/ajax_calls.html' %}
+    
+    <script>
+    // === GESTION DES PAIEMENTS AJAX ===
+    
+    // Ajouter un paiement
+    $(document).on('submit', '#payment-form', function(e) {
+        e.preventDefault();
+        
+        const form = $(this);
+        const formData = new FormData(form[0]);
+        const submitBtn = form.find('button[type="submit"]');
+        const originalText = submitBtn.html();
+        
+        // Désactiver le bouton pendant la requête
+        submitBtn.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>Ajout...');
+        
+        // Ajouter le token CSRF aux données du formulaire
+        formData.append('csrfmiddlewaretoken', $('[name=csrfmiddlewaretoken]').val());
+        
+        $.ajax({
+            url: '{% url "ajax_add_payment" instance.id %}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    // Mettre à jour l'interface
+                    $('#payments_container').html(response.payments_html);
+                    
+                    // Réinitialiser le formulaire
+                    form[0].reset();
+                    
+                    // Réinitialiser la validation du nouveau formulaire
+                    initializePaymentForm();
+                    
+                    // Message de succès
+                    showAlert('success', 'Paiement ajouté avec succès !');
+                    
+                    // Mettre à jour le statut de la commande si nécessaire
+                    if (response.is_fully_paid) {
+                        showAlert('success', 'Commande entièrement payée !');
+                    }
+                } else {
+                    showAlert('danger', response.error || 'Erreur lors de l\'ajout du paiement');
+                }
+            },
+            error: function(xhr, status, error) {
+                showAlert('danger', 'Erreur de connexion. Veuillez réessayer.');
+                console.error('Erreur AJAX:', error);
+            },
+            complete: function() {
+                // Réactiver le bouton
+                submitBtn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    
+    // Supprimer un paiement
+    $(document).on('click', '.delete-payment-btn', function(e) {
+        e.preventDefault();
+        
+        if (!confirm('Êtes-vous sûr de vouloir supprimer ce paiement ?')) {
+            return;
+        }
+        
+        const btn = $(this);
+        const paymentId = btn.data('payment-id');
+        const originalHtml = btn.html();
+        
+        // Désactiver le bouton
+        btn.prop('disabled', true).html('<i class="bi bi-hourglass-split"></i>');
+        
+        $.ajax({
+            url: '{% url "ajax_delete_payment" instance.id 0 %}'.replace('0', paymentId),
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Mettre à jour l'interface
+                    $('#payments_container').html(response.payments_html);
+                    
+                    // Réinitialiser la validation du nouveau formulaire
+                    initializePaymentForm();
+                    
+                    // Message de succès
+                    showAlert('success', 'Paiement supprimé avec succès !');
+                } else {
+                    showAlert('danger', response.error || 'Erreur lors de la suppression');
+                }
+            },
+            error: function(xhr, status, error) {
+                showAlert('danger', 'Erreur de connexion. Veuillez réessayer.');
+                console.error('Erreur AJAX:', error);
+                
+                // Réactiver le bouton en cas d'erreur
+                btn.prop('disabled', false).html(originalHtml);
+            }
+        });
+    });
+    
+    // Fonction pour afficher les alertes
+    function showAlert(type, message) {
+        const alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        // Ajouter l'alerte en haut de la page
+        $('.page-wrapper').prepend(alertHtml);
+        
+        // Supprimer automatiquement après 5 secondes
+        setTimeout(function() {
+            $('.alert').fadeOut();
+        }, 5000);
+    }
+    
+    // Fonction pour initialiser le formulaire de paiement
+    function initializePaymentForm() {
+        // Réinitialiser la validation du champ montant
+        const amountField = $('#payment-amount');
+        const submitBtn = $('#payment-form button[type="submit"]');
+        
+        if (amountField.length) {
+            amountField.removeClass('is-invalid');
+            submitBtn.prop('disabled', false);
+            
+            // Mettre à jour le montant max si nécessaire
+            const remainingAmount = parseFloat($('.stat-value.text-warning').text().replace(/[^\d.]/g, '')) || 0;
+            amountField.attr('max', remainingAmount);
+        }
+    }
+    
+    // Validation en temps réel du montant (utilisation de délégation d'événements)
+    $(document).on('input', '#payment-amount', function() {
+        const amount = parseFloat($(this).val()) || 0;
+        const maxAmount = parseFloat($(this).attr('max')) || 0;
+        const submitBtn = $('#payment-form button[type="submit"]');
+        
+        if (amount > maxAmount) {
+            $(this).addClass('is-invalid');
+            submitBtn.prop('disabled', true);
+        } else if (amount <= 0) {
+            $(this).addClass('is-invalid');
+            submitBtn.prop('disabled', true);
+        } else {
+            $(this).removeClass('is-invalid');
+            submitBtn.prop('disabled', false);
+        }
+    });
+    
+    // Initialiser le formulaire au chargement de la page
+    $(document).ready(function() {
+        initializePaymentForm();
+    });
+    </script>
+{% endblock %}

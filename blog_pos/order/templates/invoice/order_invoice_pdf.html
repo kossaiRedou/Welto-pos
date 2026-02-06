@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; }
+        .header { margin-bottom: 20px; }
+        .row { width: 100%; }
+        .left { float: left; width: 50%; }
+        .right { float: right; width: 50%; text-align: right; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 6px; }
+        th { background: #f0f0f0; }
+        .totals th, .totals td { border: none; }
+        .totals td { text-align: right; }
+    </style>
+    <title>Facture - {{ order.title }}</title>
+    <!-- Simple template compatible xhtml2pdf -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Style-Type" content="text/css"/>
+    <meta http-equiv="Content-Script-Type" content="text/javascript"/>
+</head>
+<body>
+    <div class="header">
+        <table style="width:100%; border-collapse: collapse;">
+            <tr>
+                <td style="width:33%;">&nbsp;</td>
+                <td align="center" valign="top" style="width:34%;">
+                    <div style="font-size:18px; font-weight:bold;">{{ app_settings.company_name|default:'Mon Entreprise' }}</div>
+                </td>
+                <td align="right" valign="top" style="width:33%;">
+                    {% if app_settings and app_settings.company_logo %}
+                        <img src="{{ app_settings.company_logo.path }}" height="60" />
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+
+        <table style="width:100%; margin-top:10px; border-collapse: collapse;">
+            <tr>
+                <td style="width:50%; vertical-align:top;">
+                    <h3 style="margin:0 0 6px 0;">Facture</h3>
+                    <div><strong>Commande:</strong> {{ order.title }}</div>
+                    <div><strong>Date:</strong> {{ order.date }}</div>
+                </td>
+                <td style="width:50%; text-align:right; vertical-align:top;">
+                    <div><strong>Statut:</strong> {% if order.is_paid %}Payée{% else %}Impayée{% endif %}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="row">
+        <div class="left">
+            <h3>Client</h3>
+            {% if client %}
+                <div><strong>Nom:</strong> {{ client.name }}</div>
+                <div><strong>Téléphone:</strong> {{ client.phone }}</div>
+            {% else %}
+                <div>Non spécifié</div>
+            {% endif %}
+        </div>
+        <div class="right">
+            <!-- Coordonnées boutique (optionnel) -->
+        </div>
+        <div style="clear: both"></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Produit</th>
+                <th style="text-align:center">Qté</th>
+                <th style="text-align:right">PU</th>
+                <th style="text-align:right">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for it in items %}
+            <tr>
+                <td>{{ it.product.title }}</td>
+                <td style="text-align:center">{{ it.qty }}</td>
+                <td style="text-align:right">{{ it.final_price }} {{ currency }}</td>
+                <td style="text-align:right">{{ it.total_price }} {{ currency }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align:center">Aucun produit</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="totals" style="margin-top: 10px;">
+        <tr>
+            <td style="width: 80%; text-align: right;">Remise</td>
+            <td style="width: 20%; text-align: right;">{{ order.discount }} {{ currency }}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right;">Total</td>
+            <td style="text-align: right;">{{ order.final_value }} {{ currency }}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right;">Payé</td>
+            <td style="text-align: right;">{{ total_payments }} {{ currency }}</td>
+        </tr>
+        <tr>
+            <td style="text-align: right;">Reste</td>
+            <td style="text-align: right;">{{ remaining_amount }} {{ currency }}</td>
+        </tr>
+    </table>
+
+    <p style="margin-top: 20px;">Merci pour votre achat.</p>
+</body>
+</html>
+
+

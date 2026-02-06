@@ -1,0 +1,246 @@
+{% extends 'base_with_sidebar.html' %}
+{% load render_table from django_tables2 %}
+
+{% block title %}Historique des Ventes{% endblock %}
+
+{% block page_title %}
+<i class="bi bi-clock-history me-2"></i>
+Historique des Ventes
+{% endblock %}
+
+{% block page_subtitle %}
+<small class="text-muted">Toutes vos commandes et ventes</small>
+{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'create-order' %}" class="btn btn-success btn-sm">
+    <i class="bi bi-plus-circle me-1"></i>
+    Nouvelle Vente
+</a>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Styles pour les badges de statut de paiement */
+    .badge.bg-success {
+        background-color: #28a745 !important;
+        color: white;
+        font-size: 0.85em;
+        padding: 0.5em 0.75em;
+        border-radius: 0.375rem;
+        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+    }
+    
+    .badge.bg-danger {
+        background-color: #dc3545 !important;
+        color: white;
+        font-size: 0.85em;
+        padding: 0.5em 0.75em;
+        border-radius: 0.375rem;
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+    }
+    
+    .badge i {
+        font-size: 0.9em;
+    }
+    
+    /* Animation hover pour les badges */
+    .badge:hover {
+        transform: translateY(-1px);
+        transition: transform 0.2s ease;
+    }
+    
+    /* Style pour la colonne paiement dans le tableau */
+    .table th:nth-child(3), 
+    .table td:nth-child(3) {
+        text-align: center;
+        width: 130px;
+        vertical-align: middle;
+    }
+    
+    /* Style pour la colonne Actions */
+    .table th:nth-child(5), 
+    .table td:nth-child(5) {
+        text-align: center;
+        width: 80px;
+        vertical-align: middle;
+    }
+    
+    /* Style pour améliorer l'apparence du tableau */
+    .table-responsive .table {
+        margin-bottom: 0;
+    }
+    
+    .table th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+        letter-spacing: 0.5px;
+    }
+</style>
+{% endblock %}
+
+{% block content_wrapper %}
+<!-- Filtres de recherche -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h6 class="card-title">
+            <i class="bi bi-funnel me-2"></i>
+            Filtres de Recherche
+        </h6>
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Rechercher</label>
+                <input type="text" name="search_name" class="form-control" 
+                       placeholder="Nom de la commande..." value="{{ request.GET.search_name }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Date de début</label>
+                <input type="date" name="date_start" class="form-control" value="{{ request.GET.date_start }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Date de fin</label>
+                <input type="date" name="date_end" class="form-control" value="{{ request.GET.date_end }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">paiement</label>
+                <select name="is_paid" class="form-control">
+                    <option value="">Tous</option>
+                    <option value="True" {% if request.GET.is_paid == "True" %}selected{% endif %}>Payé</option>
+                    <option value="False" {% if request.GET.is_paid == "False" %}selected{% endif %}>Non payé</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="bi bi-search me-1"></i>
+                    Filtrer
+                </button>
+                <a href="{% url 'order_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Liste des commandes -->
+<div class="card">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="bi bi-list me-2"></i>
+            Liste des Commandes
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if orders %}
+            <div class="table-responsive">
+                {% render_table orders %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mt-3">Aucune commande trouvée</h4>
+                <p class="text-muted">
+                    {% if request.GET.search_name or request.GET.date_start or request.GET.date_end %}
+                        Essayez de modifier vos filtres ou 
+                        <a href="{% url 'order_list' %}">voir toutes les commandes</a>
+                    {% else %}
+                        Commencez par créer votre première vente
+                    {% endif %}
+                </p>
+                <a href="{% url 'create-order' %}" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Créer une Vente
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Résultats de calcul -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <h5 class="text-primary">Total des Ventes</h5>
+                <div id="total_sales" class="h4">Calculer...</div>
+                <button class="btn btn-outline-primary btn-sm" onclick="calculateResults()">
+                    <i class="bi bi-calculator me-1"></i>
+                    Calculer
+                </button>
+            </div>
+        </div>
+    </div>
+    <!--div class="col-md-4">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <h5 class="text-success">Montant Payé</h5>
+                <div id="paid_amount" class="h4">Calculer...</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-warning">
+            <div class="card-body text-center">
+                <h5 class="text-warning">En Attente</h5>
+                <div id="remaining_amount" class="h4">Calculer...</div>
+            </div>
+        </div>
+    </div-->
+</div>
+
+<!-- Analyse par catégorie -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="bi bi-pie-chart me-2"></i>
+            Analyse par Catégorie
+        </h6>
+    </div>
+    <div class="card-body">
+        <div id="category_analysis">
+            <div class="text-center py-3">
+                <button class="btn btn-info" onclick="calculateCategoryResults()">
+                    <i class="bi bi-graph-up me-1"></i>
+                    Analyser les Ventes par Catégorie
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function calculateResults() {
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    fetch('{% url "ajax_calculate_result" %}?' + searchParams.toString())
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector('#total_sales').innerHTML = data.result;
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            document.querySelector('#total_sales').innerHTML = 'Erreur de calcul';
+        });
+}
+
+function calculateCategoryResults() {
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    fetch('{% url "ajax_category_result" %}?' + searchParams.toString())
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector('#category_analysis').innerHTML = data.result;
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            document.querySelector('#category_analysis').innerHTML = 'Erreur de calcul';
+        });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,355 @@
+{% extends 'base_with_sidebar.html' %}
+
+{% block title %}Liste des Dépenses{% endblock %}
+
+{% block page_title %}
+<i class="bi bi-list me-2"></i>
+Liste des Dépenses
+{% endblock %}
+
+{% block page_subtitle %}
+<small class="text-muted">Gestion et suivi de toutes les dépenses</small>
+{% endblock %}
+
+{% block header_actions %}
+<div class="btn-group" role="group">
+    <a href="{% url 'aprovision:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>
+        Retour Dashboard
+    </a>
+    <a href="{% url 'aprovision:nouvelle_depense' %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i>
+        Nouvelle Dépense
+    </a>
+    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#newTypeModal">
+        <i class="bi bi-tags me-1"></i>
+        Nouveau Type
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .filter-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .expense-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
+    .total-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .color-picker {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content_wrapper %}
+<!-- Total des dépenses -->
+<div class="total-card">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h6 class="mb-2">Total des Dépenses Affichées</h6>
+            <h3 class="mb-0">{{ total_depenses|floatformat:0 }} FCFA</h3>
+        </div>
+        <div class="col-md-4 text-end">
+            <i class="bi bi-calculator" style="font-size: 3rem; opacity: 0.3;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Filtres -->
+<div class="filter-card">
+    <h6 class="mb-3">
+        <i class="bi bi-funnel me-2"></i>
+        Filtres de Recherche
+    </h6>
+    <form method="get" class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">Type de dépense</label>
+            <select name="type_depense" class="form-control" id="filter-type-depense">
+                <option value="">Tous les types</option>
+                {% for type in types_depense %}
+                    <option value="{{ type.id }}" {% if request.GET.type_depense == type.id|stringformat:"s" %}selected{% endif %}>
+                        {{ type.nom }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Date début</label>
+            <input type="date" name="date_debut" class="form-control" value="{{ request.GET.date_debut }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Date fin</label>
+            <input type="date" name="date_fin" class="form-control" value="{{ request.GET.date_fin }}">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">
+                <i class="bi bi-search me-1"></i>
+                Filtrer
+            </button>
+            <a href="{% url 'aprovision:depense_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i>
+                Reset
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Liste des dépenses -->
+<div class="card">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="bi bi-list me-2"></i>
+            Liste des Dépenses ({{ depenses|length }} résultat{{ depenses|length|pluralize }})
+        </h6>
+    </div>
+    <div class="card-body p-0">
+        {% if depenses %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Montant</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for depense in depenses %}
+                        <tr>
+                            <td>
+                                <strong>{{ depense.date_depense|date:"d/m/Y" }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge" style="background-color: {{ depense.type_depense.couleur }}; color: white;">
+                                    {{ depense.type_depense.nom }}
+                                </span>
+                            </td>
+                            <td>
+                                <strong>{{ depense.description }}</strong>
+                                {% if depense.fournisseur %}
+                                    <br><small class="text-muted">Fournisseur: {{ depense.fournisseur }}</small>
+                                {% endif %}
+                                {% if depense.reference %}
+                                    <br><small class="text-muted">Réf: {{ depense.reference }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <strong class="text-danger">{{ depense.montant|floatformat:0 }} FCFA</strong>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-primary" title="Voir détails">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-warning" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <div class="card-footer">
+                    <nav>
+                        <ul class="pagination pagination-sm justify-content-center mb-0">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                        <i class="bi bi-chevron-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+                            
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                                        <i class="bi bi-chevron-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: #6c757d; opacity: 0.5;"></i>
+                <h5 class="text-muted mt-3">Aucune dépense trouvée</h5>
+                <p class="text-muted">
+                    {% if request.GET %}
+                        Aucune dépense ne correspond aux critères de recherche.
+                    {% else %}
+                        Commencez par ajouter votre première dépense.
+                    {% endif %}
+                </p>
+                <a href="{% url 'aprovision:nouvelle_depense' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Première Dépense
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal pour créer un nouveau type de dépense -->
+<div class="modal fade" id="newTypeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Nouveau Type de Dépense
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newTypeForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nom du type *</label>
+                        <input type="text" class="form-control" id="newTypeName" 
+                               placeholder="Ex: Transport, Fournitures, Main d'œuvre..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Couleur</label>
+                        <input type="color" class="color-picker" id="newTypeColor" value="#667eea">
+                        <small class="text-muted">Choisissez une couleur pour identifier ce type</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Annuler
+                </button>
+                <button type="button" class="btn btn-primary" id="saveNewType">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Créer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Créer un nouveau type de dépense
+    $('#saveNewType').click(function() {
+        const name = $('#newTypeName').val().trim();
+        const color = $('#newTypeColor').val();
+        
+        if (!name) {
+            alert('Veuillez saisir un nom pour le type de dépense.');
+            return;
+        }
+        
+        const btn = $(this);
+        const originalText = btn.html();
+        btn.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>Création...');
+        
+        $.ajax({
+            url: '{% url "aprovision:ajax_create_type_depense" %}',
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': $('[name=csrfmiddlewaretoken]').val()
+            },
+            data: JSON.stringify({
+                nom: name,
+                couleur: color
+            }),
+            contentType: 'application/json',
+            success: function(response) {
+                if (response.success) {
+                    // Ajouter le nouveau type aux listes de filtres
+                    const filterSelect = $('#filter-type-depense');
+                    filterSelect.append(`
+                        <option value="${response.type_depense.id}">
+                            ${response.type_depense.nom}
+                        </option>
+                    `);
+                    
+                    // Fermer le modal
+                    $('#newTypeModal').modal('hide');
+                    
+                    // Réinitialiser le formulaire
+                    $('#newTypeName').val('');
+                    $('#newTypeColor').val('#667eea');
+                    
+                    // Message de succès
+                    showAlert('success', response.message);
+                } else {
+                    showAlert('danger', response.error);
+                }
+            },
+            error: function() {
+                showAlert('danger', 'Erreur de connexion. Veuillez réessayer.');
+            },
+            complete: function() {
+                btn.prop('disabled', false).html(originalText);
+            }
+        });
+    });
+    
+    // Fonction d'alerte
+    function showAlert(type, message) {
+        const alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        $('body').append(alertHtml);
+        
+        setTimeout(function() {
+            $('.alert').fadeOut();
+        }, 5000);
+    }
+});
+</script>
+{% endblock %}

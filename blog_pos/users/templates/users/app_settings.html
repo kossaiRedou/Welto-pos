@@ -1,0 +1,50 @@
+{% extends 'base_with_sidebar.html' %}
+
+
+{% block title %}Paramètres de l'application{% endblock %}
+
+{% block page_title %}
+<i class="bi bi-gear me-2"></i>
+Paramètres de l'application
+{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Paramètres généraux</div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">{{ form.currency_label.label }}</label>
+            {{ form.currency_label }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">{{ form.low_stock_threshold.label }}</label>
+            {{ form.low_stock_threshold }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">{{ form.company_name.label }}</label>
+            {{ form.company_name }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">{{ form.company_logo.label }}</label>
+            {% if form.instance.company_logo %}
+              <div class="mb-2">
+                <img src="{{ form.instance.company_logo.url }}?v={{ form.instance.updated_at|date:'U' }}" alt="Logo" style="max-height:60px;">
+              </div>
+            {% endif %}
+            {{ form.company_logo }}
+          </div>
+          <button class="btn btn-primary" type="submit">
+            <i class="bi bi-save me-1"></i>Enregistrer
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

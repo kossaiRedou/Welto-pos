@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activation WELTO - Licence Requise</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+        
+        .activation-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .license-form {
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .current-license {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .current-license h3 {
+            color: #2e7d32;
+            margin-bottom: 0.5rem;
+        }
+        
+        .license-info {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-error {
+            background: #ffebee;
+            border: 1px solid #f44336;
+            color: #c62828;
+        }
+        
+        .alert-success {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        .contact-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="activation-container">
+        <div class="logo"> WELTO</div>
+        <div class="subtitle">Système de Point de Vente</div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% if current_license %}
+            <div class="current-license">
+                <h3> Licence Active</h3>
+                <div class="license-info">
+                    <p><strong>Expire le:</strong> {{ current_license.expiry_date }}</p>
+                    <p><strong>Jours restants:</strong> {{ current_license.days_remaining }}</p>
+                </div>
+            </div>
+            <a href="{% url 'create-order' %}" class="btn">Accéder à WELTO</a>
+        {% else %}
+            <h2>Activation de Licence Requise</h2>
+            <p style="margin-bottom: 2rem; color: #666;">
+                Veuillez saisir votre clé de licence pour activer WELTO.
+            </p>
+            
+            <form method="post" class="license-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="license_key">Clé de Licence:</label>
+                    <textarea 
+                        name="license_key" 
+                        id="license_key" 
+                        placeholder="Collez votre clé de licence ici..."
+                        required
+                    ></textarea>
+                </div>
+                <button type="submit" class="btn"> Activer la Licence</button>
+            </form>
+        {% endif %}
+        
+        <div class="contact-info">
+            <p><strong>Besoin d'aide ?</strong></p>
+            <p> Email: aliou@gabithex.fr</p>
+            <p> WhatsApp: +33 6 41 91 75 29</p>
+            <p> Site web: www.gabithex/welto.fr</p>
+        </div>
+        
+        <div class="footer">
+            © 2025 WELTO - Aliou Diallo, Ingénieur IA
+        </div>
+    </div>
+    
+    <script>
+        // Auto-focus sur le champ de licence
+        document.addEventListener('DOMContentLoaded', function() {
+            const licenseField = document.getElementById('license_key');
+            if (licenseField) {
+                licenseField.focus();
+            }
+        });
+    </script>
+</body>
+</html>
