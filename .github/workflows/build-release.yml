@@ -49,7 +49,6 @@ jobs:
           xcopy blog_pos\aprovision desktop_app\resources\aprovision\ /E /I /Y
           xcopy blog_pos\product desktop_app\resources\product\ /E /I /Y
           xcopy blog_pos\licensing desktop_app\resources\licensing\ /E /I /Y
-          xcopy blog_pos\staticfiles desktop_app\resources\staticfiles\ /E /I /Y
         shell: powershell
       
       - name: Install Electron dependencies
