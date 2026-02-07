@@ -1,5 +1,6 @@
 
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -13,6 +14,14 @@ else:
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Détecter si on est en mode PyInstaller bundlé
+if getattr(sys, 'frozen', False):
+    # Mode PyInstaller: utiliser le chemin du bundle
+    BUNDLE_DIR = sys._MEIPASS
+    print(f" [WELTO] Mode PyInstaller détecté: {BUNDLE_DIR}")
+else:
+    BUNDLE_DIR = None
 
 # Configuration userData pour la persistance des données (Windows: %APPDATA%\WELTO)
 USER_DATA_PATH = os.getenv('WELTO_USER_DATA', None)
@@ -173,7 +182,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Ajuster STATIC_ROOT selon le mode (développement ou PyInstaller bundlé)
+if BUNDLE_DIR:
+    # Mode PyInstaller: fichiers statiques dans le bundle
+    STATIC_ROOT = os.path.join(BUNDLE_DIR, 'staticfiles')
+    print(f" [WELTO] Static files path (bundled): {STATIC_ROOT}")
+else:
+    # Mode développement: fichiers statiques dans BASE_DIR
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Configuration Whitenoise pour les fichiers statiques en production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

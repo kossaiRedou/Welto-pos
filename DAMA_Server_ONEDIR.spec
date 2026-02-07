@@ -20,8 +20,8 @@ a = Analysis(
         # Templates Django (optionnels - collectés s'ils existent)
         # Note: PyInstaller ignorera automatiquement les chemins manquants avec warn_on_missing_imports=False
         
-        # Static files Django
-        ('blog_pos/order/static', 'order/static'),
+        # Static files Django - Tous les fichiers statiques collectés
+        ('blog_pos/staticfiles', 'staticfiles'),
         
         # Templates django_tables2 (requis pour les tableaux)
         # Sera collecté automatiquement depuis site-packages pendant le build

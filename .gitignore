@@ -52,7 +52,7 @@ db.sqlite3-journal
 db.sqlite3-shm
 db.sqlite3-wal
 media/
-staticfiles/
+# staticfiles/ - INCLUS pour le build PyInstaller (nécessaire pour GitHub Actions)
 
 # Environment variables
 .env
@@ -295,9 +295,10 @@ debug/
 # Keep GitHub workflows
 !.github/
 
-# Keep static files in source (but not collected staticfiles)
+# Keep static files in source AND collected staticfiles (needed for PyInstaller build)
 !blog_pos/order/static/
 !blog_pos/*/static/
+!blog_pos/staticfiles/
 
 # Keep empty directories with .gitkeep
 !.gitkeep
