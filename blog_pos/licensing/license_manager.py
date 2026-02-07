@@ -16,9 +16,16 @@ class LicenseManager:
     """Gestionnaire de licences WELTO"""
     
     def __init__(self):
-        # Licence dans le dossier de l'application plutôt que home utilisateur
-        app_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        self.license_file = os.path.join(app_dir, '.welto_license')
+        # Utiliser userData pour persister la licence entre les mises à jour
+        user_data_path = os.getenv('WELTO_USER_DATA')
+        if user_data_path:
+            # Mode production: userData (Windows: %APPDATA%\WELTO)
+            license_dir = user_data_path
+        else:
+            # Mode développement: dossier de l'application
+            license_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        self.license_file = os.path.join(license_dir, '.welto_license')
         # Clé de chiffrement basée sur une signature de l'application
         self.app_signature = "WELTO_POS_2025_ALIOU_DIALLO_IA"
         self.cipher_key = self._generate_cipher_key()
