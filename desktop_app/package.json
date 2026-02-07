@@ -1,6 +1,6 @@
 {
   "name": "welto-pos-desktop",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "WELTO Point of Sale - Solution complète par Aliou Diallo",
   "main": "src/main.js",
   "homepage": "./",
