@@ -14,8 +14,10 @@ static_files = django_dir / 'order' / 'static'
 templates_files = django_dir
 
 # Templates django_tables2 (requis pour OrderListView, ProductTable, etc.)
-import django_tables2
-dt2_path = os.path.dirname(django_tables2.__file__)
+# Utiliser find_spec pour éviter d'importer django_tables2 (déclencherait Django settings)
+import importlib.util
+_dt2_spec = importlib.util.find_spec("django_tables2")
+dt2_path = _dt2_spec.submodule_search_locations[0]
 dt2_templates = os.path.join(dt2_path, 'templates')
 
 a = Analysis(
