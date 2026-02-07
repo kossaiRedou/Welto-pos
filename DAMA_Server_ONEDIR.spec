@@ -3,6 +3,7 @@
 # Format: Dossier avec exécutable + dépendances (pas d'extraction = démarrage instantané)
 
 import sys
+import os
 from pathlib import Path
 
 block_cipher = None
@@ -11,6 +12,11 @@ block_cipher = None
 django_dir = Path('blog_pos')
 static_files = django_dir / 'order' / 'static'
 templates_files = django_dir
+
+# Templates django_tables2 (requis pour OrderListView, ProductTable, etc.)
+import django_tables2
+dt2_path = os.path.dirname(django_tables2.__file__)
+dt2_templates = os.path.join(dt2_path, 'templates')
 
 a = Analysis(
     ['blog_pos/Welto.py'],
@@ -23,8 +29,8 @@ a = Analysis(
         # Static files Django - Tous les fichiers statiques collectés
         ('blog_pos/staticfiles', 'staticfiles'),
         
-        # Templates django_tables2 (requis pour les tableaux)
-        # Sera collecté automatiquement depuis site-packages pendant le build
+        # Templates django_tables2 (bootstrap.html, etc.) - requis pour /order-list/
+        (dt2_templates, 'django_tables2/templates'),
         
         # Settings et configuration Django
         ('blog_pos/blog_pos', 'blog_pos'),
