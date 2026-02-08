@@ -193,9 +193,8 @@ else:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Configuration Whitenoise pour les fichiers statiques
-# CompressedStaticFilesStorage (sans Manifest) : copie les fichiers tels quels + compression gzip
-# Pas de hash dans les noms de fichiers, pas de staticfiles.json
-# Compatible avec le build local ET le CI sans divergence
+# CompressedStaticFilesStorage (sans Manifest) : pas besoin de staticfiles.json
+# Idéal pour app desktop bundlée (pas de CDN cache à invalider)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Configuration de sécurité pour production (DEBUG=False)

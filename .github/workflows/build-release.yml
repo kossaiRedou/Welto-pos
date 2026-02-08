@@ -38,6 +38,7 @@ jobs:
         env:
           DJANGO_SETTINGS_MODULE: blog_pos.settings
 
+
       - name: Build Django executable
         run: |
           python -c "import sys; print(f'Python: {sys.version}')"
