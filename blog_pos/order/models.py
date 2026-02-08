@@ -233,6 +233,7 @@ class Payment(models.Model):
         ('cash', 'Espèces'),
         ('wave', 'Wave'),
         ('mobile', 'Mobile Money'),
+        ('card', 'Carte bancaire'),
         ('bank', 'Virement bancaire'),
         ('credit', 'Crédit'),
         ('other', 'Autre')

@@ -9,22 +9,41 @@
         evt.preventDefault();
         const btn = $(this);
         const url = btn.attr('data-href');
+        const productId = btn.attr('data-product-id');
         
-        // Désactiver le bouton pendant la requête
+        // Récupérer la quantité saisie
+        const qtyInput = $('#qty-' + productId);
+        const qty = parseInt(qtyInput.val()) || 1;
+        
+        // Valider la quantité
+        if (qty < 1) {
+            alert('La quantité doit être au moins 1');
+            return;
+        }
+        
+        const maxQty = parseInt(qtyInput.attr('max'));
+        if (qty > maxQty) {
+            alert('Quantité demandée (' + qty + ') supérieure au stock disponible (' + maxQty + ')');
+            return;
+        }
+        
+        // Désactiver le bouton et l'input pendant la requête
         btn.prop('disabled', true);
+        qtyInput.prop('disabled', true);
         btn.html('<i class="bi bi-hourglass-split me-1"></i>Ajout...');
         
         $.ajax({
             method: 'GET',
             dataType: 'json',
-            url: url,
+            url: url + '?qty=' + qty,
             success : function (data) {
                 if (data.success === false) {
                     // Afficher l'erreur
                     alert(data.error || 'Erreur lors de l\'ajout du produit');
-                    // Réactiver le bouton
+                    // Réactiver le bouton et l'input
                     btn.prop('disabled', false);
-                    btn.html('<i class="bi bi-plus-circle me-1"></i>Add');
+                    qtyInput.prop('disabled', false);
+                    btn.html('<i class="bi bi-plus-circle me-1"></i>Ajouter');
                 } else {
                     // Mettre à jour la commande
                     $('#order_item_container').html(data.result);
@@ -33,13 +52,17 @@
                     if (data.products) {
                         $('#product_container').html(data.products);
                     }
+                    
+                    // Réinitialiser l'input à 1 (après succès)
+                    // Note: Le produit sera rechargé, donc cette ligne n'est pas critique
                 }
             },
             error: function() {
                 alert('Erreur de connexion. Veuillez réessayer.');
-                // Réactiver le bouton
+                // Réactiver le bouton et l'input
                 btn.prop('disabled', false);
-                btn.html('<i class="bi bi-plus-circle me-1"></i>Add');
+                qtyInput.prop('disabled', false);
+                btn.html('<i class="bi bi-plus-circle me-1"></i>Ajouter');
             }
         })
     });
