@@ -8,7 +8,7 @@ const log = require('electron-log');
 // Configuration de l'application
 const APP_CONFIG = {
     name: 'WELTO',
-    version: '1.0.1',
+    version: '10.0.10',
     djangoPort: 8000,
     djangoHost: '127.0.0.1',
     windowWidth: 1400,
