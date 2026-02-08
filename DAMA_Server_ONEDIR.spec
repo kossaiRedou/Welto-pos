@@ -5,6 +5,7 @@
 import sys
 import os
 from pathlib import Path
+from PyInstaller.utils.hooks import collect_data_files
 
 block_cipher = None
 
@@ -27,9 +28,6 @@ a = Analysis(
     datas=[
         # Templates Django (optionnels - collectés s'ils existent)
         # Note: PyInstaller ignorera automatiquement les chemins manquants avec warn_on_missing_imports=False
-        
-        # Static files Django - Tous les fichiers statiques collectés
-        ('blog_pos/staticfiles', 'staticfiles'),
         
         # Templates django_tables2 (bootstrap.html, etc.) - requis pour /order-list/
         (dt2_templates, 'django_tables2/templates'),
@@ -141,6 +139,10 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
+
+# Ajouter staticfiles avec Tree pour copie récursive complète
+# Tree() copie TOUS les fichiers et sous-dossiers (JS, CSS, images, fonts, etc.)
+a.datas += Tree('blog_pos/staticfiles', prefix='staticfiles')
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 

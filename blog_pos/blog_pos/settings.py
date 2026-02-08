@@ -15,13 +15,15 @@ else:
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Détecter si on est en mode PyInstaller bundlé
+# Détecter si on est en mode PyInstaller bundlé (app desktop)
 if getattr(sys, 'frozen', False):
     # Mode PyInstaller: utiliser le chemin du bundle
     BUNDLE_DIR = sys._MEIPASS
+    IS_DESKTOP_APP = True
     print(f" [WELTO] Mode PyInstaller détecté: {BUNDLE_DIR}")
 else:
     BUNDLE_DIR = None
+    IS_DESKTOP_APP = False
 
 # Configuration userData pour la persistance des données (Windows: %APPDATA%\WELTO)
 USER_DATA_PATH = os.getenv('WELTO_USER_DATA', None)
@@ -193,9 +195,22 @@ else:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Configuration Whitenoise pour les fichiers statiques
-# CompressedStaticFilesStorage (sans Manifest) : pas besoin de staticfiles.json
-# Idéal pour app desktop bundlée (pas de CDN cache à invalider)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+if IS_DESKTOP_APP:
+    # Mode Desktop : CompressedStaticFilesStorage (sans Manifest)
+    # Pas de staticfiles.json, les fichiers sont servis directement via urls.py
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+    print(f" [WELTO] Mode Desktop : static files servis directement par Django")
+else:
+    # Mode Web : CompressedManifestStaticFilesStorage (avec Manifest)
+    # Cache busting avec staticfiles.json pour invalidation CDN
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    
+    # Configuration Whitenoise pour production web
+    WHITENOISE_MAX_AGE = 31536000  # 1 an de cache pour fichiers statiques avec hash
+    WHITENOISE_ALLOW_ALL_ORIGINS = True  # CORS pour CDN si nécessaire
+    WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ('jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'gz', 'tgz', 'bz2', 'tbz', 'xz', 'br', 'swf', 'flv', 'woff', 'woff2')
+    
+    print(f" [WELTO] Mode Web : static files servis par Whitenoise avec cache busting")
 
 # Configuration de sécurité pour production (DEBUG=False)
 if not DEBUG:

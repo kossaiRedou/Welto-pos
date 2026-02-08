@@ -56,7 +56,15 @@ urlpatterns = [
 
 ]
 
-# Servir les fichiers média et statiques
-# Toujours actif car l'app desktop tourne en localhost uniquement
+# Servir les fichiers média (toujours actif en local)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Servir les fichiers statiques selon le mode
+if getattr(settings, 'IS_DESKTOP_APP', False):
+    # Mode Desktop : Django sert les static files directement
+    # (Whitenoise a des problèmes avec PyInstaller _internal/)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+elif settings.DEBUG:
+    # Mode Développement : Django sert les static files
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# Mode Web Production (DEBUG=False) : Whitenoise sert les static files via middleware
