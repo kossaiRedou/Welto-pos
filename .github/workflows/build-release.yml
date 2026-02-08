@@ -31,6 +31,13 @@ jobs:
           pip install -r blog_pos/requirements.txt
           pip install pyinstaller
       
+      - name: Collect static files
+        run: |
+          cd blog_pos
+          python manage.py collectstatic --noinput
+        env:
+          DJANGO_SETTINGS_MODULE: blog_pos.settings
+      
       - name: Build Django executable
         run: |
           python -c "import sys; print(f'Python: {sys.version}')"

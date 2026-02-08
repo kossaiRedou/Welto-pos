@@ -192,8 +192,10 @@ else:
     # Mode développement: fichiers statiques dans BASE_DIR
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Configuration Whitenoise pour les fichiers statiques en production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Configuration Whitenoise pour les fichiers statiques
+# CompressedStaticFilesStorage (sans Manifest) : pas besoin de staticfiles.json
+# Idéal pour app desktop bundlée (pas de CDN cache à invalider)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Configuration de sécurité pour production (DEBUG=False)
 if not DEBUG:
