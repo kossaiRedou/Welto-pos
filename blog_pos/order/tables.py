@@ -37,6 +37,12 @@ class OrderTable(tables.Table):
         model = Order
         template_name = 'django_tables2/bootstrap.html'
         fields = ['date', 'title', 'payment_status', 'tag_final_value', 'action']
+        attrs = {
+            'class': 'table table-striped table-hover table-sm table-responsive-sm',
+            'thead': {
+                'class': 'table-dark'
+            }
+        }
 
 
 class ProductTable(tables.Table):
@@ -83,6 +89,12 @@ class ProductTable(tables.Table):
         model = Product
         template_name = 'django_tables2/bootstrap.html'
         fields = ['title', 'category', 'qty', 'tag_final_value']
+        attrs = {
+            'class': 'table table-striped table-hover table-sm table-responsive-sm',
+            'thead': {
+                'class': 'table-dark'
+            }
+        }
 
 
 class OrderItemTable(tables.Table):
@@ -97,3 +109,9 @@ class OrderItemTable(tables.Table):
         model = OrderItem
         template_name = 'django_tables2/bootstrap.html'
         fields = ['product', 'qty', 'tag_final_price']
+        attrs = {
+            'class': 'table table-striped table-hover table-sm table-responsive-sm',
+            'thead': {
+                'class': 'table-dark'
+            }
+        }

@@ -1,3 +1,4 @@
+{% load number_filters %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -80,8 +81,8 @@
             <tr>
                 <td>{{ it.product.title }}</td>
                 <td style="text-align:center">{{ it.qty }}</td>
-                <td style="text-align:right">{{ it.final_price }} {{ currency }}</td>
-                <td style="text-align:right">{{ it.total_price }} {{ currency }}</td>
+                <td style="text-align:right">{{ it.final_price|format_number }} {{ currency }}</td>
+                <td style="text-align:right">{{ it.total_price|format_number }} {{ currency }}</td>
             </tr>
             {% empty %}
             <tr>
@@ -94,19 +95,19 @@
     <table class="totals" style="margin-top: 10px;">
         <tr>
             <td style="width: 80%; text-align: right;">Remise</td>
-            <td style="width: 20%; text-align: right;">{{ order.discount }} {{ currency }}</td>
+            <td style="width: 20%; text-align: right;">{{ order.discount|format_number }} {{ currency }}</td>
         </tr>
         <tr>
             <td style="text-align: right;">Total</td>
-            <td style="text-align: right;">{{ order.final_value }} {{ currency }}</td>
+            <td style="text-align: right;">{{ order.final_value|format_number }} {{ currency }}</td>
         </tr>
         <tr>
             <td style="text-align: right;">Payé</td>
-            <td style="text-align: right;">{{ total_payments }} {{ currency }}</td>
+            <td style="text-align: right;">{{ total_payments|format_number }} {{ currency }}</td>
         </tr>
         <tr>
             <td style="text-align: right;">Reste</td>
-            <td style="text-align: right;">{{ remaining_amount }} {{ currency }}</td>
+            <td style="text-align: right;">{{ remaining_amount|format_number }} {{ currency }}</td>
         </tr>
     </table>
 

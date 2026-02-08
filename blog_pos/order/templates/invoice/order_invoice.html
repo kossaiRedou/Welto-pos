@@ -1,4 +1,5 @@
 {% extends 'base_with_sidebar.html' %}
+{% load number_filters %}
 
 {% block title %}Facture commande{% endblock %}
 
@@ -72,8 +73,8 @@
                                 <tr>
                                     <td>{{ it.product.title }}</td>
                                     <td class="text-center">{{ it.qty }}</td>
-                                    <td class="text-end">{{ it.final_price }} {{ currency }}</td>
-                                    <td class="text-end">{{ it.total_price }} {{ currency }}</td>
+                                    <td class="text-end">{{ it.final_price|format_number }} {{ currency }}</td>
+                                    <td class="text-end">{{ it.total_price|format_number }} {{ currency }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
@@ -84,19 +85,19 @@
                             <tfoot>
                                 <tr>
                                     <th colspan="3" class="text-end">Remise</th>
-                                    <th class="text-end">{{ order.discount }} {{ currency }}</th>
+                                    <th class="text-end">{{ order.discount|format_number }} {{ currency }}</th>
                                 </tr>
                                 <tr>
                                     <th colspan="3" class="text-end">Total</th>
-                                    <th class="text-end">{{ order.final_value }} {{ currency }}</th>
+                                    <th class="text-end">{{ order.final_value|format_number }} {{ currency }}</th>
                                 </tr>
                                 <tr>
                                     <th colspan="3" class="text-end">Payé</th>
-                                    <th class="text-end">{{ total_payments }} {{ currency }}</th>
+                                    <th class="text-end">{{ total_payments|format_number }} {{ currency }}</th>
                                 </tr>
                                 <tr>
                                     <th colspan="3" class="text-end">Reste</th>
-                                    <th class="text-end">{{ remaining_amount }} {{ currency }}</th>
+                                    <th class="text-end">{{ remaining_amount|format_number }} {{ currency }}</th>
                                 </tr>
                             </tfoot>
                         </table>

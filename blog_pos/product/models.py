@@ -57,11 +57,11 @@ class Product(models.Model):
         return self.title
 
     def tag_final_value(self):
-        return f'{self.final_value} {get_currency_label()}'
+        return f'{self.final_value:.2f} {get_currency_label()}'
     tag_final_value.short_description = 'Value'
     
     def tag_prix_achat(self):
         if self.prix_achat > 0:
-            return f'{self.prix_achat} {get_currency_label()}'
+            return f'{self.prix_achat:.2f} {get_currency_label()}'
         return 'Non défini'
     tag_prix_achat.short_description = 'Prix d\'achat'

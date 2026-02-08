@@ -1,4 +1,5 @@
 {% extends 'base_with_sidebar.html' %}
+{% load number_filters %}
 
 {% block title %}Tableau de Bord{% endblock %}
 
@@ -31,7 +32,7 @@ Tableau de Bord
 <div class="row mb-4">
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="stats-card primary">
-            <div class="stats-number">{{ today_sales|cut:" €"|default:"0" }}</div>
+            <div class="stats-number">{{ today_sales|format_number }}</div>
             <div class="stats-label">{{ currency|default:'GMD' }} vendus aujourd'hui</div>
             {% if sales_evolution_positive %}
                 <div class="stats-change positive">
@@ -50,14 +51,14 @@ Tableau de Bord
             <div class="stats-number">{{ today_orders_count }}</div>
             <div class="stats-label">Ventes aujourd'hui</div>
             <div class="stats-change">
-                <i class="bi bi-info-circle"></i> Panier moyen: {{ avg_order_today|cut:" €" }} {{ currency|default:'GMD' }}
+                <i class="bi bi-info-circle"></i> Panier moyen: {{ avg_order_today|format_number }} {{ currency|default:'GMD' }}
             </div>
         </div>
     </div>
     
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="stats-card info">
-            <div class="stats-number">{{ week_sales|cut:" €"|default:"0" }}</div>
+            <div class="stats-number">{{ week_sales|format_number }}</div>
             <div class="stats-label">{{ currency|default:'GMD' }} cette semaine</div>
             <div class="stats-change">
                 <i class="bi bi-calendar-week"></i> 7 derniers jours
@@ -86,7 +87,7 @@ Tableau de Bord
 <div class="row mb-4">
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="stats-card danger">
-            <div class="stats-number">{{ today_expenses|cut:" GMD"|default:"0" }}</div>
+            <div class="stats-number">{{ today_expenses|format_number }}</div>
             <div class="stats-label">{{ currency|default:'GMD' }} dépensés aujourd'hui</div>
             <div class="stats-change">
                 <i class="bi bi-cash-stack"></i>
@@ -96,7 +97,7 @@ Tableau de Bord
     
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="stats-card warning">
-            <div class="stats-number">{{ month_expenses|cut:" GMD"|default:"0" }}</div>
+            <div class="stats-number">{{ month_expenses|format_number }}</div>
             <div class="stats-label">Dépenses du mois</div>
             <div class="stats-change">
                 <i class="bi bi-calendar-month"></i>
@@ -106,7 +107,7 @@ Tableau de Bord
     
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="stats-card info">
-            <div class="stats-number">{{ profit_margin|floatformat:1 }}%</div>
+            <div class="stats-number">{{ profit_margin|format_percent }}%</div>
             <div class="stats-label">Marge bénéficiaire</div>
             <div class="stats-change {% if profit_margin > 0 %}positive{% else %}negative{% endif %}">
                 <i class="bi bi-percent"></i>
@@ -116,7 +117,7 @@ Tableau de Bord
     
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="stats-card secondary">
-            <div class="stats-number">{{ gross_profit|cut:" GMD"|default:"0" }}</div>
+            <div class="stats-number">{{ gross_profit|format_number }}</div>
             <div class="stats-label">Bénéfice brut estimé</div>
             <div class="stats-change {% if gross_profit|cut:' GMD'|add:0 > 0 %}positive{% else %}negative{% endif %}">
                 <i class="bi bi-graph-up"></i>

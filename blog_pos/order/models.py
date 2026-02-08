@@ -109,13 +109,13 @@ class Order(models.Model):
         return reverse('delete_order', kwargs={'pk': self.id})
 
     def tag_final_value(self):
-        return f'{self.final_value} {get_currency_label()}'
+        return f'{self.final_value:.2f} {get_currency_label()}'
 
     def tag_discount(self):
-        return f'{self.discount} {get_currency_label()}'
+        return f'{self.discount:.2f} {get_currency_label()}'
 
     def tag_value(self):
-        return f'{self.value} {get_currency_label()}'
+        return f'{self.value:.2f} {get_currency_label()}'
     
     def total_payments(self):
         """Calcule le total des paiements reçus"""
@@ -139,10 +139,10 @@ class Order(models.Model):
         return self.remaining_amount() <= Decimal('0.00')
     
     def tag_total_payments(self):
-        return f'{self.total_payments()} {get_currency_label()}'
+        return f'{self.total_payments():.2f} {get_currency_label()}'
     
     def tag_remaining_amount(self):
-        return f'{self.remaining_amount()} {get_currency_label()}'
+        return f'{self.remaining_amount():.2f} {get_currency_label()}'
     
     def client_display(self):
         """Affichage du client pour les templates"""
@@ -215,13 +215,13 @@ class OrderItem(models.Model):
         self.order.save()
 
     def tag_final_price(self):
-        return f'{self.final_price} {CURRENCY}'
+        return f'{self.final_price:.2f} {CURRENCY}'
 
     def tag_discount(self):
-        return f'{self.discount_price} {CURRENCY}'
+        return f'{self.discount_price:.2f} {CURRENCY}'
 
     def tag_price(self):
-        return f'{self.price} {CURRENCY}'
+        return f'{self.price:.2f} {CURRENCY}'
 
 
 class Payment(models.Model):
@@ -248,7 +248,7 @@ class Payment(models.Model):
         return f'{self.amount} {CURRENCY} - {self.get_method_display()}'
 
     def tag_amount(self):
-        return f'{self.amount} {get_currency_label()}'
+        return f'{self.amount:.2f} {get_currency_label()}'
 
 
 # Important: la restauration de stock lors de la suppression d'un OrderItem

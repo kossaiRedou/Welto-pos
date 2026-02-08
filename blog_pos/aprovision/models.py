@@ -48,7 +48,7 @@ class Depense(models.Model):
         return f"{self.description} - {self.montant} {CURRENCY}"
 
     def tag_montant(self):
-        return f"{self.montant} {CURRENCY}"
+        return f"{self.montant:.2f} {CURRENCY}"
     tag_montant.short_description = "Montant"
 
 
