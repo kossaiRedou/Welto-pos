@@ -465,24 +465,38 @@ def ajax_add_product(request, pk, dk):
     instance = get_object_or_404(Order, id=pk)
     product = get_object_or_404(Product, id=dk)
     
-    # Vérifier si le produit est en stock
+    # Récupérer la quantité demandée (par défaut 1)
+    try:
+        requested_qty = int(request.GET.get('qty', 1))
+        if requested_qty < 1:
+            requested_qty = 1
+    except (ValueError, TypeError):
+        requested_qty = 1
+    
+    # Vérifier si le produit a assez de stock
     if product.qty <= 0:
         return JsonResponse({
             'success': False,
             'error': f'Le produit "{product.title}" est en rupture de stock'
         })
     
+    if requested_qty > product.qty:
+        return JsonResponse({
+            'success': False,
+            'error': f'Stock insuffisant. Disponible: {product.qty}, Demandé: {requested_qty}'
+        })
+    
     order_item, created = OrderItem.objects.get_or_create(order=instance, product=product)
     if created:
-        order_item.qty = 1
+        order_item.qty = requested_qty
         order_item.price = product.value
         order_item.discount_price = product.discount_value
     else:
-        order_item.qty += 1
+        order_item.qty += requested_qty
     order_item.save()
     
     # Décrémenter le stock
-    product.qty -= 1
+    product.qty -= requested_qty
     product.save()
     
     instance.refresh_from_db()

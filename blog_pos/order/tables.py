@@ -57,11 +57,20 @@ class ProductTable(tables.Table):
     action = tables.TemplateColumn(
         '''
         {% if record.qty > 0 %}
-            <button class="btn btn-info add_button" data-href="{% url "ajax_add" instance.id record.id %}">
-                <i class="bi bi-plus-circle me-1"></i>Add
-            </button>
+            <div class="input-group input-group-sm" style="min-width: 180px;">
+                <input type="number" class="form-control qty-input" 
+                       id="qty-{{ record.id }}" 
+                       value="1" min="1" max="{{ record.qty }}" 
+                       style="max-width: 70px;"
+                       data-product-id="{{ record.id }}">
+                <button class="btn btn-info add_button" 
+                        data-href="{% url "ajax_add" instance.id record.id %}"
+                        data-product-id="{{ record.id }}">
+                    <i class="bi bi-plus-circle me-1"></i>Ajouter
+                </button>
+            </div>
         {% else %}
-            <button class="btn btn-secondary" disabled title="Stock épuisé">
+            <button class="btn btn-secondary btn-sm" disabled title="Stock épuisé">
                 <i class="bi bi-x-circle me-1"></i>Rupture
             </button>
         {% endif %}

@@ -231,7 +231,9 @@ class Payment(models.Model):
     date = models.DateField(default=datetime.date.today, help_text="Date du paiement")
     method = models.CharField(max_length=50, choices=[
         ('cash', 'Espèces'),
+        ('wave', 'Wave'),
         ('mobile', 'Mobile Money'),
+        ('card', 'Carte bancaire'),
         ('bank', 'Virement bancaire'),
         ('credit', 'Crédit'),
         ('other', 'Autre')
