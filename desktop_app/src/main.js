@@ -38,6 +38,8 @@ log.transports.console.level = 'debug';
 // Configuration d'electron-updater
 autoUpdater.logger = log;
 autoUpdater.autoDownload = false; // Demander confirmation avant téléchargement
+autoUpdater.allowPrerelease = false; // Ignorer les versions beta/rc/alpha (uniquement stable)
+autoUpdater.channel = 'latest'; // Canal stable uniquement
 
 /**
  * Initialiser les dossiers userData

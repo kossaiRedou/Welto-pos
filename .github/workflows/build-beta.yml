@@ -1,36 +1,14 @@
-name: Build and Release WELTO (Production)
+name: Build Beta/RC Release
 
 on:
   push:
     tags:
-      - 'v*'  # Déclencher sur les tags version (ex: v10.0.10, v10.0.11)
+      - 'v*-beta*'   # Ex: v10.0.11-beta, v10.0.11-beta2
+      - 'v*-rc*'     # Ex: v10.0.11-rc1, v10.0.11-rc2
+      - 'v*-alpha*'  # Ex: v10.0.11-alpha
 
 jobs:
-  # Vérification que le tag est stable (pas de suffixe beta/rc/alpha)
-  validate-tag:
-    runs-on: ubuntu-latest
-    outputs:
-      is_stable: ${{ steps.check.outputs.is_stable }}
-    steps:
-      - name: Check if tag is stable release
-        id: check
-        run: |
-          TAG="${GITHUB_REF#refs/tags/}"
-          echo "Checking tag: $TAG"
-          
-          # Vérifier si le tag contient beta, rc, ou alpha
-          if [[ "$TAG" =~ (beta|rc|alpha) ]]; then
-            echo "❌ Tag $TAG contains beta/rc/alpha suffix - skipping production build"
-            echo "is_stable=false" >> $GITHUB_OUTPUT
-            exit 1
-          else
-            echo "✅ Tag $TAG is a stable release - proceeding with production build"
-            echo "is_stable=true" >> $GITHUB_OUTPUT
-          fi
-
-  build-windows:
-    needs: validate-tag
-    if: needs.validate-tag.outputs.is_stable == 'true'
+  build-windows-beta:
     runs-on: windows-latest
     
     steps:
@@ -92,7 +70,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.DISTRIBUTION_TOKEN }}
       
-      - name: Upload to welto-distribution repo (PRODUCTION RELEASE)
+      - name: Upload to welto-distribution repo (PRERELEASE)
         uses: softprops/action-gh-release@v1
         with:
           repository: ${{ github.repository_owner }}/welto-distribution
@@ -100,26 +78,34 @@ jobs:
             desktop_app/dist/*.exe
             desktop_app/dist/*.yml
           draft: false
-          prerelease: false
+          prerelease: true
           generate_release_notes: true
           body: |
-            ## ✅ WELTO POS - Version Stable ${{ github.ref_name }}
+            ## ⚠️ WELTO POS - Version Beta/RC ${{ github.ref_name }}
             
-            **Version de production** - Les clients existants seront automatiquement notifiés de cette mise à jour.
+            **ATTENTION** : Ceci est une version de test (beta/rc/alpha).
+            
+            ### ⚡ Version de test - Pour validation uniquement
+            Cette version n'est PAS distribuée automatiquement aux clients.
+            Les mises à jour automatiques ignoreront cette version.
             
             ### 📦 Fichiers de distribution
-            - `WELTO-Setup-${{ github.ref_name }}.exe` - Installateur Windows
-            - `WELTO-Portable.exe` - Version portable
-            - `latest.yml` - Métadonnées pour auto-update
+            - `WELTO-Setup-${{ github.ref_name }}.exe` - Installateur Windows (TEST)
+            - `WELTO-Portable.exe` - Version portable (TEST)
+            - `latest.yml` - Métadonnées (ignorées par les clients en production)
             
-            ### 💾 Installation (nouveaux utilisateurs)
+            ### 🧪 Installation pour test
             1. Télécharger `WELTO-Setup-${{ github.ref_name }}.exe`
             2. Exécuter l'installateur
-            3. Suivre les instructions à l'écran
+            3. Tester toutes les fonctionnalités
+            4. Reporter les bugs ou valider pour release stable
             
-            ### 🔄 Mise à jour automatique (clients existants)
-            Si vous avez déjà WELTO installé, l'application détectera automatiquement cette mise à jour
-            et vous proposera de l'installer au prochain démarrage.
+            ### ✅ Validation
+            Si tous les tests passent, créer le tag stable :
+            ```bash
+            git tag v[VERSION]
+            git push origin v[VERSION]
+            ```
             
             ---
             © 2025 GABITHEX TEAM - Développé par Aliou Diallo
@@ -129,7 +115,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: welto-windows-installer
+          name: welto-windows-beta-${{ github.ref_name }}
           path: |
             desktop_app/dist/*.exe
-          retention-days: 30
+          retention-days: 90
