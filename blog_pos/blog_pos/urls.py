@@ -56,7 +56,7 @@ urlpatterns = [
 
 ]
 
-# Servir les fichiers média en développement
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# Servir les fichiers média et statiques
+# Toujours actif car l'app desktop tourne en localhost uniquement
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
