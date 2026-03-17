@@ -39,6 +39,7 @@ jobs:
           python manage.py collectstatic --noinput
         env:
           DJANGO_SETTINGS_MODULE: blog_pos.settings
+          PYINSTALLER_BUILD: "true"
       
       - name: Build Django executable
         run: |

@@ -1,8 +1,28 @@
 
 import os
 import sys
+import mimetypes
 from pathlib import Path
 from dotenv import load_dotenv
+
+# -----------------------------------------------------------------------
+# CORRECTION MIME TYPES WINDOWS
+# Sur certains PC Windows, le registre a des MIME types incorrects pour
+# .js, .css, etc. (ex: .js → text/html au lieu de text/javascript).
+# Python lit le registre Windows → Django envoie le mauvais Content-Type
+# → Chrome refuse d'exécuter les scripts JS (MIME type mismatch error).
+# Ces appels forcent les bons types indépendamment du registre.
+# -----------------------------------------------------------------------
+mimetypes.add_type('text/javascript', '.js')
+mimetypes.add_type('text/javascript', '.mjs')
+mimetypes.add_type('text/css', '.css')
+mimetypes.add_type('application/json', '.json')
+mimetypes.add_type('font/woff', '.woff')
+mimetypes.add_type('font/woff2', '.woff2')
+mimetypes.add_type('font/ttf', '.ttf')
+mimetypes.add_type('font/otf', '.otf')
+mimetypes.add_type('image/svg+xml', '.svg')
+mimetypes.add_type('image/x-icon', '.ico')
 
 # Charger les variables d'environnement depuis .env
 env_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
@@ -16,11 +36,11 @@ else:
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Détecter si on est en mode PyInstaller bundlé (app desktop)
-if getattr(sys, 'frozen', False):
-    # Mode PyInstaller: utiliser le chemin du bundle
-    BUNDLE_DIR = sys._MEIPASS
+# Aussi déclenché par PYINSTALLER_BUILD=true en CI pour que collectstatic utilise le bon storage
+if getattr(sys, 'frozen', False) or os.getenv('PYINSTALLER_BUILD') == 'true':
+    BUNDLE_DIR = sys._MEIPASS if getattr(sys, 'frozen', False) else None
     IS_DESKTOP_APP = True
-    print(f" [WELTO] Mode PyInstaller détecté: {BUNDLE_DIR}")
+    print(f" [WELTO] Mode Desktop/Build détecté: {BUNDLE_DIR}")
 else:
     BUNDLE_DIR = None
     IS_DESKTOP_APP = False
@@ -91,18 +111,35 @@ LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/users/login/'
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Servir fichiers statiques en production
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',  # Désactivé pour desktop (pas nécessaire)
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',  # Nécessaire pour les messages Django
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'users.middleware.SetupMiddleware',  # Middleware pour la configuration initiale
-    'licensing.middleware.LicenseMiddleware',  # Contrôle des licences WELTO
-]
+if IS_DESKTOP_APP:
+    # Mode Desktop (PyInstaller bundle) : PAS de WhitenoiseMiddleware
+    # Les fichiers statiques sont servis directement par Django via urls.py static()
+    # Whitenoise interfère avec PyInstaller et cause des erreurs 404 → MIME type text/html
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'users.middleware.SetupMiddleware',
+        'licensing.middleware.LicenseMiddleware',
+    ]
+    print(f" [WELTO] Mode Desktop : Whitenoise désactivé, Django sert les static files")
+else:
+    # Mode Web / Développement : Whitenoise actif
+    MIDDLEWARE = [
+        'django.middleware.security.SecurityMiddleware',
+        'whitenoise.middleware.WhiteNoiseMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'users.middleware.SetupMiddleware',
+        'licensing.middleware.LicenseMiddleware',
+    ]
+    print(f" [WELTO] Mode Web/Dev : Whitenoise actif pour les static files")
 
 ROOT_URLCONF = 'blog_pos.urls'
 
