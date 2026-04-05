@@ -68,7 +68,7 @@ Liste des Dépenses
     <div class="row align-items-center">
         <div class="col-md-8">
             <h6 class="mb-2">Total des Dépenses Affichées</h6>
-            <h3 class="mb-0">{{ total_depenses|floatformat:0 }} FCFA</h3>
+            <h3 class="mb-0">{{ total_depenses|floatformat:0 }} {{ currency }}</h3>
         </div>
         <div class="col-md-4 text-end">
             <i class="bi bi-calculator" style="font-size: 3rem; opacity: 0.3;"></i>
@@ -157,7 +157,7 @@ Liste des Dépenses
                                 {% endif %}
                             </td>
                             <td>
-                                <strong class="text-danger">{{ depense.montant|floatformat:0 }} FCFA</strong>
+                                <strong class="text-danger">{{ depense.montant|floatformat:0 }} {{ currency }}</strong>
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">

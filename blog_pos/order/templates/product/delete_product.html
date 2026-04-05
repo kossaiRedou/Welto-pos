@@ -21,10 +21,10 @@
                     <strong>Catégorie :</strong> {{ product.category.title|default:"Sans catégorie" }}<br>
                     <strong>Prix :</strong> 
                     {% if product.discount_value > 0 %}
-                        <span class="text-decoration-line-through">{{ product.value }} GMD</span>
-                        <span class="text-success ms-2">{{ product.discount_value }} GMD</span>
+                        <span class="text-decoration-line-through">{{ product.value }} {{ currency }}</span>
+                        <span class="text-success ms-2">{{ product.discount_value }} {{ currency }}</span>
                     {% else %}
-                        {{ product.value }} GMD
+                        {{ product.value }} {{ currency }}
                     {% endif %}<br>
                     <strong>Stock :</strong> {{ product.qty }} unité{{ product.qty|pluralize }}<br>
                     <strong>Statut :</strong> 

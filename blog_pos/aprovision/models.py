@@ -3,7 +3,9 @@ from django.conf import settings
 from django.utils import timezone
 from decimal import Decimal
 
-CURRENCY = settings.CURRENCY
+def _currency():
+    from users.models import AppSetting
+    return AppSetting.get_currency_label()
 
 
 class TypeDepense(models.Model):
@@ -45,10 +47,10 @@ class Depense(models.Model):
         ordering = ['-date_depense', '-created_at']
 
     def __str__(self):
-        return f"{self.description} - {self.montant} {CURRENCY}"
+        return f"{self.description} - {self.montant} {_currency()}"
 
     def tag_montant(self):
-        return f"{self.montant} {CURRENCY}"
+        return f"{self.montant} {_currency()}"
     tag_montant.short_description = "Montant"
 
 

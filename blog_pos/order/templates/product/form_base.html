@@ -16,7 +16,7 @@
             {% if field.name == 'value' or field.name == 'discount_value' %}
                 <div class="input-group">
                     {{ field }}
-                    <span class="input-group-text">GMD</span>
+                    <span class="input-group-text">{{ currency }}</span>
                 </div>
             {% elif field.name == 'qty' %}
                 <div class="input-group">

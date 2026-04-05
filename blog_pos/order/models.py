@@ -215,13 +215,13 @@ class OrderItem(models.Model):
         self.order.save()
 
     def tag_final_price(self):
-        return f'{self.final_price} {CURRENCY}'
+        return f'{self.final_price} {get_currency_label()}'
 
     def tag_discount(self):
-        return f'{self.discount_price} {CURRENCY}'
+        return f'{self.discount_price} {get_currency_label()}'
 
     def tag_price(self):
-        return f'{self.price} {CURRENCY}'
+        return f'{self.price} {get_currency_label()}'
 
 
 class Payment(models.Model):
@@ -245,7 +245,7 @@ class Payment(models.Model):
         ordering = ['-date', '-created_at']
 
     def __str__(self):
-        return f'{self.amount} {CURRENCY} - {self.get_method_display()}'
+        return f'{self.amount} {get_currency_label()} - {self.get_method_display()}'
 
     def tag_amount(self):
         return f'{self.amount} {get_currency_label()}'

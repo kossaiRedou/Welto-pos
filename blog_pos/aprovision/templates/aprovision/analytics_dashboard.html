@@ -553,7 +553,7 @@ function initDepensesChart() {
     const data = {
         labels: {{ depenses_par_jour|safe }}.map(item => new Date(item.date_depense).toLocaleDateString()),
         datasets: [{
-            label: 'Dépenses (GMD)',
+            label: 'Dépenses ({{ currency }})',
             data: {{ depenses_par_jour|safe }}.map(item => item.total),
             borderColor: '#007bff',
             backgroundColor: 'rgba(0, 123, 255, 0.1)',
@@ -578,7 +578,7 @@ function initDepensesChart() {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return value.toLocaleString() + ' GMD';
+                            return value.toLocaleString() + ' {{ currency }}';
                         }
                     }
                 }
@@ -596,7 +596,7 @@ function initVentesChart() {
     const data = {
         labels: {{ ventes_par_jour|safe }}.map(item => new Date(item.date).toLocaleDateString()),
         datasets: [{
-            label: 'Ventes (GMD)',
+            label: 'Ventes ({{ currency }})',
             data: {{ ventes_par_jour|safe }}.map(item => item.total),
             borderColor: '#28a745',
             backgroundColor: 'rgba(40, 167, 69, 0.1)',
@@ -621,7 +621,7 @@ function initVentesChart() {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return value.toLocaleString() + ' GMD';
+                            return value.toLocaleString() + ' {{ currency }}';
                         }
                     }
                 }
@@ -679,7 +679,7 @@ function updateAnalytics() {
             const chartDataDepenses = {
                 labels: data.depenses_par_jour.map(item => new Date(item.date_depense).toLocaleDateString()),
                 datasets: [{
-                    label: 'Dépenses (GMD)',
+                    label: 'Dépenses ({{ currency }})',
                     data: data.depenses_par_jour.map(item => item.total),
                     borderColor: '#007bff',
                     backgroundColor: 'rgba(0, 123, 255, 0.1)',
@@ -704,7 +704,7 @@ function updateAnalytics() {
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return value.toLocaleString() + ' GMD';
+                                    return value.toLocaleString() + ' {{ currency }}';
                                 }
                             }
                         }
@@ -722,7 +722,7 @@ function updateAnalytics() {
             const chartDataVentes = {
                 labels: data.ventes_par_jour.map(item => new Date(item.date).toLocaleDateString()),
                 datasets: [{
-                    label: 'Ventes (GMD)',
+                    label: 'Ventes ({{ currency }})',
                     data: data.ventes_par_jour.map(item => item.total),
                     borderColor: '#28a745',
                     backgroundColor: 'rgba(40, 167, 69, 0.1)',
@@ -747,7 +747,7 @@ function updateAnalytics() {
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return value.toLocaleString() + ' GMD';
+                                    return value.toLocaleString() + ' {{ currency }}';
                                 }
                             }
                         }

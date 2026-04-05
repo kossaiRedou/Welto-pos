@@ -118,6 +118,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'licensing.middleware.license_context_processor',  # Infos licence dans templates
+                'users.context_processors.app_settings',  # currency + company_name
             ],
         },
     },

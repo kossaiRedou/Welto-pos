@@ -158,9 +158,9 @@ Mouvements de Stock
                             </td>
                             <td class="text-end">
                                 {% if mouvement.cout_total %}
-                                    <strong>{{ mouvement.cout_total|floatformat:0 }} FCFA</strong>
+                                    <strong>{{ mouvement.cout_total|floatformat:0 }} {{ currency }}</strong>
                                     {% if mouvement.prix_achat_unitaire %}
-                                        <small class="text-muted d-block">{{ mouvement.prix_achat_unitaire|floatformat:0 }} FCFA/unité</small>
+                                        <small class="text-muted d-block">{{ mouvement.prix_achat_unitaire|floatformat:0 }} {{ currency }}/unité</small>
                                     {% endif %}
                                 {% else %}
                                     <span class="text-muted">-</span>

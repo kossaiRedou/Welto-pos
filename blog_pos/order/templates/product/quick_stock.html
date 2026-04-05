@@ -19,11 +19,11 @@
             <div class="card-body">
                 <p class="mb-2"><strong>Nom :</strong> {{ product.title }}</p>
                 <p class="mb-2"><strong>Catégorie :</strong> {{ product.category.title|default:"Sans catégorie" }}</p>
-            <p class="mb-2"><strong>Prix de vente :</strong> {{ product.final_value }} {{ currency|default:'GMD' }}</p>
+            <p class="mb-2"><strong>Prix de vente :</strong> {{ product.final_value }} {{ currency }}</p>
                 <p class="mb-2">
                     <strong>Prix d'achat :</strong> 
                     {% if product.prix_achat > 0 %}
-                    <span class="text-success">{{ product.prix_achat }} {{ currency|default:'GMD' }}</span>
+                    <span class="text-success">{{ product.prix_achat }} {{ currency }}</span>
                     {% else %}
                         <span class="text-muted">Non défini</span>
                     {% endif %}
@@ -131,11 +131,11 @@
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label for="{{ form.prix_achat_unitaire.id_for_label }}" class="form-label">
-                            Prix d'achat unitaire (FCFA) <span class="text-danger" id="prix-required">*</span>
+                            Prix d'achat unitaire ({{ currency }}) <span class="text-danger" id="prix-required">*</span>
                         </label>
                         <div class="input-group">
                             {{ form.prix_achat_unitaire }}
-                            <span class="input-group-text">FCFA</span>
+                            <span class="input-group-text">{{ currency }}</span>
                         </div>
                         <small class="form-text text-muted">{{ form.prix_achat_unitaire.help_text }}</small>
                         {% if form.prix_achat_unitaire.errors %}
@@ -174,7 +174,7 @@
             <!-- Calcul automatique du coût total -->
             <div class="alert alert-info" id="cost-preview" style="display: none;">
                 <i class="bi bi-calculator me-2"></i>
-                <strong>Coût total estimé :</strong> <span id="cost-total">0</span> FCFA
+                <strong>Coût total estimé :</strong> <span id="cost-total">0</span> {{ currency }}
             </div>
         </div>
     </div>

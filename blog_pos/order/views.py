@@ -47,12 +47,13 @@ except ImportError:
     USERS_AVAILABLE = False
 
 
-# Devise dynamique (fallback sur settings.CURRENCY)
-try:
-    CURRENCY = get_currency_label()
-except Exception:
-    from django.conf import settings as dj_settings
-    CURRENCY = getattr(dj_settings, 'CURRENCY', 'GMD')
+# Devise dynamique — appelée à chaque requête, pas au démarrage
+def _currency():
+    try:
+        return get_currency_label()
+    except Exception:
+        from django.conf import settings as dj_settings
+        return getattr(dj_settings, 'CURRENCY', 'GMD')
 
 
 class HomepageView(ListView):
@@ -136,23 +137,23 @@ class HomepageView(ListView):
         # === FORMATAGE POUR L'AFFICHAGE ===
         context.update({
             # Ventes du jour
-            'today_sales': f'{today_sales:,.0f} {CURRENCY}',
+            'today_sales': f'{today_sales:,.2f}',
             'today_orders_count': today_orders_count,
-            'avg_order_today': f'{avg_order_today:,.0f} {CURRENCY}',
-            
+            'avg_order_today': f'{avg_order_today:,.2f}',
+
             # Comparaison avec hier
-            'yesterday_sales': f'{yesterday_sales:,.0f} {CURRENCY}',
+            'yesterday_sales': f'{yesterday_sales:,.2f}',
             'sales_evolution': f'{sales_evolution:+.1f}%',
             'sales_evolution_positive': sales_evolution >= 0,
-            
+
             # Périodes plus longues
-            'week_sales': f'{week_sales:,.0f} {CURRENCY}',
+            'week_sales': f'{week_sales:,.2f}',
             'week_orders_count': week_orders_count,
-            'month_sales': f'{month_sales:,.0f} {CURRENCY}',
+            'month_sales': f'{month_sales:,.2f}',
             'month_orders_count': month_orders_count,
-            
+
             # Argent en attente
-            'unpaid_total': f'{unpaid_total:,.0f} {CURRENCY}',
+            'unpaid_total': f'{unpaid_total:,.2f}',
             'has_unpaid': unpaid_total > 0,
             
             # Stock
@@ -209,13 +210,13 @@ class HomepageView(ListView):
             
             context.update({
                 # Dépenses
-                'today_expenses': f'{today_expenses:,.0f} {CURRENCY}',
-                'month_expenses': f'{month_expenses:,.0f} {CURRENCY}',
+                'today_expenses': f'{today_expenses:,.2f}',
+                'month_expenses': f'{month_expenses:,.2f}',
                 'top_expense_types': top_expense_types,
                 'recent_stock_movements': recent_stock_movements,
-                
+
                 # Analyse financière
-                'gross_profit': f'{gross_profit:,.0f} {CURRENCY}',
+                'gross_profit': f'{gross_profit:,.2f}',
                 'profit_margin': (gross_profit / month_sales * 100) if month_sales > 0 else 0,
                 'expenses_ratio': (month_expenses / month_sales * 100) if month_sales > 0 else 0,
                 
@@ -708,8 +709,8 @@ def ajax_calculate_results_view(request):
         total_paid_value = orders.filter(is_paid=True).aggregate(Sum('final_value'))['final_value__sum'] if\
             orders.filter(is_paid=True) else 0
         remaining_value = total_value - total_paid_value
-    total_value, total_paid_value, remaining_value = f'{total_value} {CURRENCY}',\
-                                                     f'{total_paid_value} {CURRENCY}', f'{remaining_value} {CURRENCY}'
+    total_value, total_paid_value, remaining_value = f'{total_value} {_currency()}',\
+                                                     f'{total_paid_value} {_currency()}', f'{remaining_value} {_currency()}'
     data['result'] = render_to_string(template_name='include/result_container.html',
                                       request=request,
                                       context=locals())
@@ -757,7 +758,7 @@ def ajax_add_payment(request, pk):
             if amount > remaining:
                 return JsonResponse({
                     'success': False, 
-                    'error': f'Le paiement ({amount} {CURRENCY}) dépasse le montant restant ({remaining} {CURRENCY})'
+                    'error': f'Le paiement ({amount} {_currency()}) dépasse le montant restant ({remaining} {_currency()})'
                 })
             
             # Créer le paiement
