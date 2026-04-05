@@ -393,6 +393,7 @@ def invoice_preview_view(request, pk):
     except Exception:
         currency = CURRENCY
     items = order.order_items.all()
+    payments = order.payments.all()
     # Charger paramètres entreprise
     try:
         from users.models import AppSetting
@@ -402,6 +403,7 @@ def invoice_preview_view(request, pk):
     context = {
         'order': order,
         'items': items,
+        'payments': payments,
         'currency': currency,
         'total_payments': order.total_payments(),
         'remaining_amount': order.remaining_amount(),
@@ -428,6 +430,7 @@ def invoice_pdf_view(request, pk):
         currency = CURRENCY
 
     items = order.order_items.all()
+    payments = order.payments.all()
 
     # Paramètres globaux
     try:
@@ -439,6 +442,7 @@ def invoice_pdf_view(request, pk):
     context = {
         'order': order,
         'items': items,
+        'payments': payments,
         'currency': currency,
         'total_payments': order.total_payments(),
         'remaining_amount': order.remaining_amount(),

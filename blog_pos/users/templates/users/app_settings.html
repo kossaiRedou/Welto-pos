@@ -29,7 +29,15 @@ Paramètres de l'application
             {{ form.company_name }}
           </div>
           <div class="mb-3">
-            <label class="form-label">{{ form.company_logo.label }}</label>
+            <label class="form-label">{{ form.company_tagline.label }}</label>
+            {{ form.company_tagline }}
+            <small class="form-text text-muted">Affiché sous le nom sur les factures (max 80 caractères)</small>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">
+              {{ form.company_logo.label }}
+              <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Pour un meilleur rendu sur les factures, utilisez un logo avec un fond blanc ou transparent (PNG)."></i>
+            </label>
             {% if form.instance.company_logo %}
               <div class="mb-2">
                 <img src="{{ form.instance.company_logo.url }}?v={{ form.instance.updated_at|date:'U' }}" alt="Logo" style="max-height:60px;">
@@ -37,6 +45,67 @@ Paramètres de l'application
             {% endif %}
             {{ form.company_logo }}
           </div>
+
+          <hr>
+          <h6 class="mb-3"><i class="bi bi-palette me-1"></i>Couleurs de l'entreprise (factures)</h6>
+          <div class="row mb-3">
+            <div class="col-4">
+              <label class="form-label">{{ form.brand_color_primary.label }}</label>
+              <div class="d-flex align-items-center gap-2">
+                {{ form.brand_color_primary }}
+                <small class="text-muted">Titres, barres</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <label class="form-label">{{ form.brand_color_secondary.label }}</label>
+              <div class="d-flex align-items-center gap-2">
+                {{ form.brand_color_secondary }}
+                <small class="text-muted">Accents</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <label class="form-label">{{ form.brand_color_accent.label }}</label>
+              <div class="d-flex align-items-center gap-2">
+                {{ form.brand_color_accent }}
+                <small class="text-muted">Alertes</small>
+              </div>
+            </div>
+          </div>
+
+          <hr>
+          <h6 class="mb-3"><i class="bi bi-pen me-1"></i>Signature & Cachet (factures)</h6>
+          <div class="mb-3">
+            <label class="form-label">{{ form.signatory_name.label }}</label>
+            {{ form.signatory_name }}
+            <small class="form-text text-muted">Nom et titre affichés sous la signature sur les factures</small>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">
+                {{ form.signature_image.label }}
+                <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Utilisez une image PNG avec fond transparent pour un meilleur rendu."></i>
+              </label>
+              {% if form.instance.signature_image %}
+                <div class="mb-2 p-2 bg-light rounded text-center">
+                  <img src="{{ form.instance.signature_image.url }}?v={{ form.instance.updated_at|date:'U' }}" alt="Signature" style="max-height:60px;">
+                </div>
+              {% endif %}
+              {{ form.signature_image }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">
+                {{ form.stamp_image.label }}
+                <i class="bi bi-info-circle text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Utilisez une image PNG avec fond transparent pour un meilleur rendu."></i>
+              </label>
+              {% if form.instance.stamp_image %}
+                <div class="mb-2 p-2 bg-light rounded text-center">
+                  <img src="{{ form.instance.stamp_image.url }}?v={{ form.instance.updated_at|date:'U' }}" alt="Cachet" style="max-height:60px;">
+                </div>
+              {% endif %}
+              {{ form.stamp_image }}
+            </div>
+          </div>
+
           <button class="btn btn-primary" type="submit">
             <i class="bi bi-save me-1"></i>Enregistrer
           </button>
@@ -47,4 +116,9 @@ Paramètres de l'application
 </div>
 {% endblock %}
 
-
+{% block extra_js %}
+<script>
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(function (el) { return new bootstrap.Tooltip(el); });
+</script>
+{% endblock %}

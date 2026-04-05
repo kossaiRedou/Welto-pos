@@ -249,16 +249,35 @@ class PasswordChangeForm(forms.Form):
 class AppSettingForm(forms.ModelForm):
     class Meta:
         model = AppSetting
-        fields = ['currency_label', 'low_stock_threshold', 'company_name', 'company_logo']
+        fields = [
+            'currency_label', 'low_stock_threshold',
+            'company_name', 'company_tagline', 'company_logo',
+            'brand_color_primary', 'brand_color_secondary', 'brand_color_accent',
+            'signatory_name', 'signature_image', 'stamp_image',
+        ]
         labels = {
             'currency_label': "Devise (label)",
             'low_stock_threshold': "Seuil d'alerte stock",
             'company_name': "Nom de l'entreprise",
+            'company_tagline': "Slogan / Activité",
             'company_logo': "Logo de l'entreprise",
+            'brand_color_primary': "Couleur principale",
+            'brand_color_secondary': "Couleur secondaire",
+            'brand_color_accent': "Couleur d'accent",
+            'signatory_name': "Nom du signataire",
+            'signature_image': "Signature du responsable",
+            'stamp_image': "Cachet / Tampon",
         }
         widgets = {
             'currency_label': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: GMD, FCFA, €'}),
             'low_stock_threshold': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
             'company_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom commercial'}),
+            'company_tagline': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Boutique de vêtements, Restaurant...', 'maxlength': '80'}),
             'company_logo': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+            'brand_color_primary': forms.TextInput(attrs={'type': 'color', 'class': 'form-control form-control-color', 'style': 'width:60px; height:40px; padding:3px;'}),
+            'brand_color_secondary': forms.TextInput(attrs={'type': 'color', 'class': 'form-control form-control-color', 'style': 'width:60px; height:40px; padding:3px;'}),
+            'brand_color_accent': forms.TextInput(attrs={'type': 'color', 'class': 'form-control form-control-color', 'style': 'width:60px; height:40px; padding:3px;'}),
+            'signatory_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Aliou Diallo - Gérant'}),
+            'signature_image': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+            'stamp_image': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
         }

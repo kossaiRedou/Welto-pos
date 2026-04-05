@@ -173,6 +173,52 @@ class AppSetting(models.Model):
         verbose_name=_('Logo de l\'entreprise'),
         help_text=_('Image du logo (PNG/JPG). Affichée sur les factures et l\'interface')
     )
+    company_tagline = models.CharField(
+        max_length=80,
+        blank=True,
+        default='',
+        verbose_name=_('Slogan / Activité'),
+        help_text=_('Court descriptif affiché sous le nom sur les factures (max 80 car.). Ex: Boutique de vêtements, Restaurant, etc.')
+    )
+    brand_color_primary = models.CharField(
+        max_length=7,
+        default='#2c5aa0',
+        verbose_name=_('Couleur principale'),
+        help_text=_('Couleur principale de l\'entreprise (titres, barres)')
+    )
+    brand_color_secondary = models.CharField(
+        max_length=7,
+        default='#198754',
+        verbose_name=_('Couleur secondaire'),
+        help_text=_('Couleur secondaire (accents, montants payés)')
+    )
+    brand_color_accent = models.CharField(
+        max_length=7,
+        default='#dc3545',
+        verbose_name=_('Couleur d\'accent'),
+        help_text=_('Couleur d\'accent (alertes, montants restants)')
+    )
+    signature_image = models.ImageField(
+        upload_to='signatures/',
+        null=True,
+        blank=True,
+        verbose_name=_('Signature du responsable'),
+        help_text=_('Image de signature manuscrite (PNG fond transparent recommandé)')
+    )
+    stamp_image = models.ImageField(
+        upload_to='stamps/',
+        null=True,
+        blank=True,
+        verbose_name=_('Cachet / Tampon'),
+        help_text=_('Image du cachet d\'entreprise (PNG fond transparent recommandé)')
+    )
+    signatory_name = models.CharField(
+        max_length=100,
+        blank=True,
+        default='',
+        verbose_name=_('Nom du signataire'),
+        help_text=_('Nom + titre affichés sous la signature. Ex: Aliou Diallo - Gérant')
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
