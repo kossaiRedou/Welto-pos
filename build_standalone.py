@@ -17,21 +17,28 @@ def print_step(step, message):
     print(f"ETAPE {step}: {message}")
     print(f"{'='*60}")
 
-def run_command(cmd, description, cwd=None):
+def run_command(cmd, description, cwd=None, stream_output=False):
     """Exécuter une commande avec gestion d'erreur"""
     print(f"\n {description}...")
     print(f"Commande: {cmd}")
-    
+
     try:
-        result = subprocess.run(cmd, shell=True, check=True, cwd=cwd, 
-                              capture_output=True, text=True)
+        if stream_output:
+            # Afficher la sortie en temps réel (pour les builds longs)
+            result = subprocess.run(cmd, shell=True, check=True, cwd=cwd)
+        else:
+            result = subprocess.run(cmd, shell=True, check=True, cwd=cwd,
+                                  capture_output=True, text=True, encoding='utf-8', errors='replace')
+            if result.stdout:
+                print(f"Output: {result.stdout.strip()}")
         print(f" {description} - SUCCESS")
-        if result.stdout:
-            print(f"Output: {result.stdout.strip()}")
         return True
     except subprocess.CalledProcessError as e:
         print(f" {description} - FAILED")
-        print(f"Error: {e.stderr}")
+        if hasattr(e, 'stderr') and e.stderr:
+            print(f"Error: {e.stderr}")
+        else:
+            print(f"Error: exit code {e.returncode}")
         return False
 
 def clean_build_directories():
@@ -297,9 +304,10 @@ def build_electron_app():
     # Construire l'application avec variables d'environnement
     print("🚀 Construction Electron avec signature désactivée...")
     return run_command(
-        "npm run build:win", 
+        "npm run build:win",
         "Construction de l'application Electron",
-        cwd=desktop_dir
+        cwd=desktop_dir,
+        stream_output=True
     )
 
 def main():
